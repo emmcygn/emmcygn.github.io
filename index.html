@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Analytics Test App</title>
+    <!-- Userpilot integration -->
+    <script>window.userpilotSettings = {token: "NX-d7cf842a"};</script>
+    <script src="https://js.userpilot.io/sdk/latest.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Analytics Test Dashboard</h1>
+        
+        <div class="user-section">
+            <h2>User Management</h2>
+            <div class="form-group">
+                <input type="text" id="userId" placeholder="User ID">
+                <input type="text" id="userName" placeholder="Name">
+                <input type="email" id="userEmail" placeholder="Email">
+                <button onclick="identifyUser()">Identify User</button>
+            </div>
+        </div>
+        
+        <div class="events-section">
+            <h2>Track Events</h2>
+            <div class="predefined-events">
+                <button onclick="trackEvent('Page Viewed')">Track Page View</button>
+                <button onclick="trackEvent('Chat Response Received')">Chat Response</button>
+                <button onclick="trackEvent('Message Sent')">Message Sent</button>
+                <button onclick="trackEvent('Submitted Form')">Submit Form</button>
+                <button onclick="trackEvent('Clicked Feature')">Click Feature</button>
+            </div>
+            
+            <div class="custom-event">
+                <input type="text" id="customEvent" placeholder="Custom Event Name">
+                <button onclick="trackCustomEvent()">Track Custom Event</button>
+            </div>
+            
+            <div class="complex-event">
+                <h3>Event with Properties</h3>
+                <input type="text" id="complexEventName" placeholder="Event Name">
+                <input type="text" id="propKey1" placeholder="Property Key">
+                <input type="text" id="propValue1" placeholder="Property Value">
+                <input type="text" id="propKey2" placeholder="Property Key (optional)">
+                <input type="text" id="propValue2" placeholder="Property Value (optional)">
+                <button onclick="trackComplexEvent()">Track with Properties</button>
+            </div>
+        </div>
+        
+        <div class="navigation-section">
+            <h2>Simulate Navigation</h2>
+            <button onclick="simulateNavigation('home')">Home Page</button>
+            <button onclick="simulateNavigation('products')">Products Page</button>
+            <button onclick="simulateNavigation('about')">About Page</button>
+            <button onclick="simulateNavigation('contact')">Contact Page</button>
+        </div>
+        
+        <div class="status-box" id="status">
+            Ready to track events...
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
