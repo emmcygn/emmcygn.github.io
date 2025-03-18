@@ -1,65 +1,267 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Analytics Test App</title>
-    <!-- Userpilot integration -->
-    <script>window.userpilotSettings = {token: "NX-d7cf842a"};</script>
-    <script src="https://js.userpilot.io/sdk/latest.js"></script>
-    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Add Content Security Policy for Sprig -->
+    <meta http-equiv="Content-Security-Policy" content="connect-src blob: data: https://api.sprig.com https://cdn.sprig.com; font-src data:; worker-src blob:;">
+    <title>ShopSmart - Ecommerce Demo</title>
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Sprig SDK installation -->
+    <script type="text/javascript">
+    (function(l,e,a,p) {
+        if (window.Sprig) return;
+        window.Sprig = function(){S._queue.push(arguments)}
+        var S = window.Sprig;S.appId = a;S._queue = [];window.UserLeap=S;
+        a=l.createElement('script');
+        a.async=1;a.src=e+'?id='+S.appId;
+        p=l.getElementsByTagName('script')[0];
+        p.parentNode.insertBefore(a, p);
+    })(document, 'https://cdn.sprig.com/shim.js', 'ENVIRONMENT_ID');
+    </script>
 </head>
 <body>
-    <div class="container">
-        <h1>Analytics Test Dashboard</h1>
-        
-        <div class="user-section">
-            <h2>User Management</h2>
-            <div class="form-group">
-                <input type="text" id="userId" placeholder="User ID">
-                <input type="text" id="userName" placeholder="Name">
-                <input type="email" id="userEmail" placeholder="Email">
-                <button onclick="identifyUser()">Identify User</button>
+    <header>
+        <div class="container">
+            <div class="header-wrapper">
+                <div class="logo">
+                    <a href="#"><span class="brand-box">S</span> ShopSmart</a>
+                </div>
+                <div class="search-bar">
+                    <input type="text" placeholder="Search for products...">
+                    <button type="submit"><img src="https://img.icons8.com/material-outlined/24/ffffff/search--v1.png"/></button>
+                </div>
+                <div class="user-actions">
+                    <a href="#" id="sign-in">Sign in</a>
+                    <a href="#" id="wishlist">Wishlist</a>
+                    <a href="#" id="cart">My cart</a>
+                </div>
             </div>
+            <nav class="categories">
+                <ul>
+                    <li><a href="#" data-category="all">Categories</a></li>
+                    <li><a href="#" data-category="hot-deals">Hot offers</a></li>
+                    <li><a href="#" data-category="gift-boxes">Gift boxes</a></li>
+                    <li><a href="#" data-category="projects">Projects</a></li>
+                    <li><a href="#" data-category="menu-items">Menu item</a></li>
+                    <li><a href="#" data-category="others">Others</a></li>
+                </ul>
+            </nav>
         </div>
-        
-        <div class="events-section">
-            <h2>Track Events</h2>
-            <div class="predefined-events">
-                <button onclick="trackEvent('Page Viewed')">Track Page View</button>
-                <button onclick="trackEvent('Chat Response Received')">Chat Response</button>
-                <button onclick="trackEvent('Message Sent')">Message Sent</button>
-                <button onclick="trackEvent('Submitted Form')">Submit Form</button>
-                <button onclick="trackEvent('Clicked Feature')">Click Feature</button>
-            </div>
-            
-            <div class="custom-event">
-                <input type="text" id="customEvent" placeholder="Custom Event Name">
-                <button onclick="trackCustomEvent()">Track Custom Event</button>
-            </div>
-            
-            <div class="complex-event">
-                <h3>Event with Properties</h3>
-                <input type="text" id="complexEventName" placeholder="Event Name">
-                <input type="text" id="propKey1" placeholder="Property Key">
-                <input type="text" id="propValue1" placeholder="Property Value">
-                <input type="text" id="propKey2" placeholder="Property Key (optional)">
-                <input type="text" id="propValue2" placeholder="Property Value (optional)">
-                <button onclick="trackComplexEvent()">Track with Properties</button>
-            </div>
-        </div>
-        
-        <div class="navigation-section">
-            <h2>Simulate Navigation</h2>
-            <button onclick="simulateNavigation('home')">Home Page</button>
-            <button onclick="simulateNavigation('products')">Products Page</button>
-            <button onclick="simulateNavigation('about')">About Page</button>
-            <button onclick="simulateNavigation('contact')">Contact Page</button>
-        </div>
-        
-        <div class="status-box" id="status">
-            Ready to track events...
-        </div>
-    </div>
+    </header>
 
-    <script src="app.js"></script>
+    <section class="banner">
+        <div class="container">
+            <div class="banner-content">
+                <h1>Best Deals on Electronics</h1>
+                <p>Limited time sale for products</p>
+                <button class="cta-button" id="shop-now">SHOP NOW</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="category-icons">
+        <div class="container">
+            <div class="icon-grid">
+                <div class="icon-item" data-category="equipment">
+                    <img src="https://img.icons8.com/ios/50/000000/laptop--v1.png"/>
+                    <span>Equipment</span>
+                </div>
+                <div class="icon-item" data-category="jewelry">
+                    <img src="https://img.icons8.com/ios/50/000000/diamond--v1.png"/>
+                    <span>Jewellery</span>
+                </div>
+                <div class="icon-item" data-category="mens">
+                    <img src="https://img.icons8.com/ios/50/000000/t-shirt--v1.png"/>
+                    <span>Men's wear</span>
+                </div>
+                <div class="icon-item" data-category="ladies">
+                    <img src="https://img.icons8.com/ios/50/000000/dress--v1.png"/>
+                    <span>Ladies' wear</span>
+                </div>
+                <div class="icon-item" data-category="auto">
+                    <img src="https://img.icons8.com/ios/50/000000/car--v1.png"/>
+                    <span>Automobiles</span>
+                </div>
+                <div class="icon-item" data-category="home">
+                    <img src="https://img.icons8.com/ios/50/000000/home--v1.png"/>
+                    <span>Home items</span>
+                </div>
+                <div class="icon-item" data-category="kids">
+                    <img src="https://img.icons8.com/ios/50/000000/baby-bottle--v1.png"/>
+                    <span>Kids toys</span>
+                </div>
+                <div class="icon-item" data-category="accessories">
+                    <img src="https://img.icons8.com/ios/50/000000/watch--v1.png"/>
+                    <span>Accessories</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="products">
+        <div class="container">
+            <h2>New products</h2>
+            <div class="product-grid">
+                <!-- Product 1 -->
+                <div class="product-card" data-product-id="1">
+                    <div class="product-badge">NEW</div>
+                    <img src="https://via.placeholder.com/200x250/cccccc/666666?text=T-Shirt" alt="T-Shirt">
+                    <div class="product-info">
+                        <h3>Men's T-shirt Cotton Basic</h3>
+                        <p class="price">$29.50</p>
+                        <div class="product-meta">
+                            <span class="rating">★★★★☆</span>
+                            <button class="wishlist-button" data-product-id="1">♡</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Product 2 -->
+                <div class="product-card" data-product-id="2">
+                    <div class="product-badge">NEW</div>
+                    <img src="https://via.placeholder.com/200x250/3366cc/ffffff?text=Blue+Shirt" alt="Blue Shirt">
+                    <div class="product-info">
+                        <h3>T-shirt Blue cotton</h3>
+                        <p class="price">$39.50</p>
+                        <div class="product-meta">
+                            <span class="rating">★★★★★</span>
+                            <button class="wishlist-button" data-product-id="2">♡</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Product 3 -->
+                <div class="product-card" data-product-id="3">
+                    <div class="product-badge">NEW</div>
+                    <img src="https://via.placeholder.com/200x250/ffaa00/ffffff?text=Jacket" alt="Winter Jacket">
+                    <div class="product-info">
+                        <h3>Warm Winter Jacket</h3>
+                        <p class="price">$59.50</p>
+                        <div class="product-meta">
+                            <span class="rating">★★★★☆</span>
+                            <button class="wishlist-button" data-product-id="3">♡</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Product 4 -->
+                <div class="product-card" data-product-id="4">
+                    <img src="https://via.placeholder.com/200x250/0033cc/ffffff?text=Jeans" alt="Denim Jeans">
+                    <div class="product-info">
+                        <h3>Men's Denim Textile Jeans</h3>
+                        <p class="price">$35.50</p>
+                        <div class="product-meta">
+                            <span class="rating">★★★★☆</span>
+                            <button class="wishlist-button" data-product-id="4">♡</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="promo-banner">
+        <div class="container">
+            <div class="promo-content">
+                <h2>Great place for promo banners and ads</h2>
+                <button class="cta-button orange" id="check-it">CHECK IT</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="recommended">
+        <div class="container">
+            <h2>Recommended</h2>
+            <div class="product-grid">
+                <!-- Recommended Product 1 -->
+                <div class="product-card" data-product-id="5">
+                    <div class="product-badge sale">SALE</div>
+                    <img src="https://via.placeholder.com/200x250/333333/ffffff?text=Headphones" alt="Gaming Headset">
+                    <div class="product-info">
+                        <h3>Gaming Headset with Mic</h3>
+                        <p class="price">$89.50</p>
+                        <div class="product-meta">
+                            <span class="rating">★★★★★</span>
+                            <button class="wishlist-button" data-product-id="5">♡</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Recommended Product 2 -->
+                <div class="product-card" data-product-id="6">
+                    <div class="product-badge sale">SALE</div>
+                    <img src="https://via.placeholder.com/200x250/333333/ffffff?text=Smartwatch" alt="Smartwatch">
+                    <div class="product-info">
+                        <h3>Sport Smart Watch (brushed)</h3>
+                        <p class="price">$99.50</p>
+                        <div class="product-meta">
+                            <span class="rating">★★★★☆</span>
+                            <button class="wishlist-button" data-product-id="6">♡</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Recommended Product 3 -->
+                <div class="product-card" data-product-id="7">
+                    <div class="product-badge sale">SALE</div>
+                    <img src="https://via.placeholder.com/200x250/333333/ffffff?text=iPhone" alt="iPhone">
+                    <div class="product-info">
+                        <h3>Apple iPhone 12 Pro, 512GB</h3>
+                        <p class="price">$979.90</p>
+                        <div class="product-meta">
+                            <span class="rating">★★★★★</span>
+                            <button class="wishlist-button" data-product-id="7">♡</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Recommended Product 4 -->
+                <div class="product-card" data-product-id="8">
+                    <div class="product-badge sale">SALE</div>
+                    <img src="https://via.placeholder.com/200x250/333333/ffffff?text=Phone" alt="Huawei">
+                    <div class="product-info">
+                        <h3>Huawei Nova 8 Original</h3>
+                        <p class="price">$399.90</p>
+                        <div class="product-meta">
+                            <span class="rating">★★★★☆</span>
+                            <button class="wishlist-button" data-product-id="8">♡</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="newsletter">
+        <div class="container">
+            <div class="newsletter-box">
+                <div class="newsletter-icon">S</div>
+                <div class="newsletter-content">
+                    <h3>Subscribe</h3>
+                    <p>Get weekly updates</p>
+                </div>
+                <div class="newsletter-form">
+                    <input type="email" placeholder="Email">
+                    <button id="subscribe-btn">Subscribe</button>
+                </div>
+                <div class="social-icons">
+                    <a href="#"><img src="https://img.icons8.com/ios-filled/24/666666/youtube-play.png"/></a>
+                    <a href="#"><img src="https://img.icons8.com/ios-filled/24/666666/facebook.png"/></a>
+                    <a href="#"><img src="https://img.icons8.com/ios-filled/24/666666/twitter.png"/></a>
+                    <a href="#"><img src="https://img.icons8.com/ios-filled/24/666666/instagram-new.png"/></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 ShopSmart. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
 </body>
 </html>
