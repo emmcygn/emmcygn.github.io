@@ -1,201 +1,284 @@
-// Wait for DOM to fully load
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize Sprig user identification
-    identifyUser();
+// Store simulation data
+const simulationData = {
+    users: {},
+    groups: {},
+    companies: {},
+    totalEvents: 0,
+    firstSeen: null,
+    lastSeen: null,
+    previousPeriodEvents: 0,
+    currentPeriodEvents: 0
+};
+
+// Event types to simulate
+const eventTypes = [
+    'Page View', 
+    'Button Click', 
+    'Form Submit',
+    'Video Play',
+    'Sign Up',
+    'Login',
+    'Purchase',
+    'Feature Used',
+    'Account Created',
+    'Feedback Submitted'
+];
+
+// DOM Elements
+const userTypeSelect = document.getElementById('userType');
+const entityIdInput = document.getElementById('entityId');
+const generateIdButton = document.getElementById('generateId');
+const performEventButton = document.getElementById('performEvent');
+const identifyButton = document.getElementById('identify');
+const eventLogList = document.getElementById('eventLog');
+
+// Metric displays
+const totalEventsDisplay = document.getElementById('totalEvents');
+const activeDaysDisplay = document.getElementById('activeDays');
+const firstSeenDisplay = document.getElementById('firstSeen');
+const lastSeenDisplay = document.getElementById('lastSeen');
+const usageTrendDisplay = document.getElementById('usageTrend');
+const totalSeatsDisplay = document.getElementById('totalSeats');
+const activeSeatsDisplay = document.getElementById('activeSeats');
+
+// Generate a random ID
+function generateRandomId() {
+    return Math.random().toString(36).substring(2, 10);
+}
+
+// Format date for display
+function formatDate(date) {
+    if (!date) return 'Never';
+    return new Date(date).toLocaleString();
+}
+
+// Update metrics displays
+function updateMetrics() {
+    // Count users, groups, companies
+    const userCount = Object.keys(simulationData.users).length;
+    const groupCount = Object.keys(simulationData.groups).length;
+    const companyCount = Object.keys(simulationData.companies).length;
     
-    // Track page view
-    trackPageView();
+    // Count active entities (had events in the last 30 days)
+    const now = new Date();
+    const thirtyDaysAgo = new Date(now - 30 * 24 * 60 * 60 * 1000);
     
-    // Set up event handlers
-    setupEventHandlers();
+    let activeUsers = 0;
+    let activeGroups = 0;
+    let activeCompanies = 0;
+    
+    // Count active users
+    for (const userId in simulationData.users) {
+        if (simulationData.users[userId].lastSeen >= thirtyDaysAgo) {
+            activeUsers++;
+        }
+    }
+    
+    // Count active groups
+    for (const groupId in simulationData.groups) {
+        if (simulationData.groups[groupId].lastSeen >= thirtyDaysAgo) {
+            activeGroups++;
+        }
+    }
+    
+    // Count active companies
+    for (const companyId in simulationData.companies) {
+        if (simulationData.companies[companyId].lastSeen >= thirtyDaysAgo) {
+            activeCompanies++;
+        }
+    }
+    
+    // Calculate usage trend
+    let usageTrend = 0;
+    if (simulationData.previousPeriodEvents > 0) {
+        usageTrend = ((simulationData.currentPeriodEvents - simulationData.previousPeriodEvents) / simulationData.previousPeriodEvents) * 100;
+    }
+    
+    // Update displays
+    totalEventsDisplay.textContent = simulationData.totalEvents;
+    
+    // Calculate active days for current user type and ID
+    const type = userTypeSelect.value;
+    const id = entityIdInput.value;
+    let activeDays = 0;
+    
+    if (type === 'user' && simulationData.users[id]) {
+        activeDays = simulationData.users[id].activeDays || 0;
+    } else if (type === 'group' && simulationData.groups[id]) {
+        activeDays = simulationData.groups[id].activeDays || 0;
+    } else if (type === 'company' && simulationData.companies[id]) {
+        activeDays = simulationData.companies[id].activeDays || 0;
+    }
+    
+    activeDaysDisplay.textContent = activeDays;
+    firstSeenDisplay.textContent = formatDate(simulationData.firstSeen);
+    lastSeenDisplay.textContent = formatDate(simulationData.lastSeen);
+    usageTrendDisplay.textContent = `${usageTrend > 0 ? '+' : ''}${usageTrend.toFixed(1)}%`;
+    
+    totalSeatsDisplay.textContent = userCount;
+    activeSeatsDisplay.textContent = activeUsers;
+}
+
+// Log an event to the UI and simulate tracking
+function logEvent(eventType, entityType, entityId) {
+    const now = new Date();
+    const timestamp = now.toLocaleString();
+    
+    // Add to log
+    const logItem = document.createElement('li');
+    logItem.textContent = `[${timestamp}] ${entityType} ${entityId} performed ${eventType}`;
+    eventLogList.prepend(logItem);
+    
+    // Update simulation data
+    simulationData.totalEvents++;
+    simulationData.lastSeen = now;
+    
+    if (!simulationData.firstSeen) {
+        simulationData.firstSeen = now;
+    }
+    
+    // Track events for usage trend
+    const twoWeeksAgo = new Date(now - 14 * 24 * 60 * 60 * 1000);
+    const fourWeeksAgo = new Date(now - 28 * 24 * 60 * 60 * 1000);
+    
+    if (now > twoWeeksAgo) {
+        simulationData.currentPeriodEvents++;
+    } else if (now > fourWeeksAgo) {
+        simulationData.previousPeriodEvents++;
+    }
+    
+    // Update entity data
+    const today = now.toDateString();
+    
+    if (entityType === 'user') {
+        if (!simulationData.users[entityId]) {
+            simulationData.users[entityId] = {
+                firstSeen: now,
+                lastSeen: now,
+                activeDays: 1,
+                eventDates: [today]
+            };
+        } else {
+            simulationData.users[entityId].lastSeen = now;
+            if (!simulationData.users[entityId].eventDates.includes(today)) {
+                simulationData.users[entityId].eventDates.push(today);
+                simulationData.users[entityId].activeDays = simulationData.users[entityId].eventDates.length;
+            }
+        }
+    } else if (entityType === 'group') {
+        if (!simulationData.groups[entityId]) {
+            simulationData.groups[entityId] = {
+                firstSeen: now,
+                lastSeen: now,
+                activeDays: 1,
+                eventDates: [today]
+            };
+        } else {
+            simulationData.groups[entityId].lastSeen = now;
+            if (!simulationData.groups[entityId].eventDates.includes(today)) {
+                simulationData.groups[entityId].eventDates.push(today);
+                simulationData.groups[entityId].activeDays = simulationData.groups[entityId].eventDates.length;
+            }
+        }
+    } else if (entityType === 'company') {
+        if (!simulationData.companies[entityId]) {
+            simulationData.companies[entityId] = {
+                firstSeen: now,
+                lastSeen: now,
+                activeDays: 1,
+                eventDates: [today]
+            };
+        } else {
+            simulationData.companies[entityId].lastSeen = now;
+            if (!simulationData.companies[entityId].eventDates.includes(today)) {
+                simulationData.companies[entityId].eventDates.push(today);
+                simulationData.companies[entityId].activeDays = simulationData.companies[entityId].eventDates.length;
+            }
+        }
+    }
+    
+    // Send to June.so analytics
+    try {
+        if (window.analytics && window.analytics.track) {
+            window.analytics.track(eventType, {
+                entityType: entityType,
+                entityId: entityId
+            });
+        }
+    } catch (e) {
+        console.error('Error tracking event with June.so:', e);
+    }
+    
+    // Update UI
+    updateMetrics();
+}
+
+// Event listeners
+generateIdButton.addEventListener('click', () => {
+    entityIdInput.value = generateRandomId();
 });
 
-// Identify user to Sprig
-function identifyUser() {
-    // Generate a random user ID if needed
-    const userId = localStorage.getItem('userId') || 'user_' + Math.floor(Math.random() * 100000);
+performEventButton.addEventListener('click', () => {
+    const entityType = userTypeSelect.value;
+    let entityId = entityIdInput.value.trim();
     
-    // Save userId in localStorage
-    if (!localStorage.getItem('userId')) {
-        localStorage.setItem('userId', userId);
+    if (!entityId) {
+        entityId = generateRandomId();
+        entityIdInput.value = entityId;
     }
     
-    // Get or set properties from localStorage
-    const properties = {
-        email: localStorage.getItem('userEmail') || 'user' + userId.split('_')[1] + '@example.com',
-        name: localStorage.getItem('userName') || 'Test User ' + userId.split('_')[1],
-        signupDate: localStorage.getItem('signupDate') || new Date().toISOString(),
-        userType: localStorage.getItem('userType') || Math.random() > 0.5 ? 'returning' : 'new'
-    };
+    // Pick a random event type
+    const eventType = eventTypes[Math.floor(Math.random() * eventTypes.length)];
     
-    // Save all properties in localStorage
-    Object.keys(properties).forEach(key => {
-        if (!localStorage.getItem(key)) {
-            localStorage.setItem(key, properties[key]);
-        }
-    });
-    
-    try {
-        // Call Sprig identify
-        window.Sprig('identify', userId, {
-            email: properties.email,
-            name: properties.name,
-            created_at: properties.signupDate,
-            user_type: properties.userType
-        });
-        
-        console.log('Sprig: User identified', userId, properties);
-    } catch (e) {
-        console.error('Sprig: Error identifying user', e);
-    }
-}
+    // Log and track the event
+    logEvent(eventType, entityType, entityId);
+});
 
-// Track page view in Sprig
-function trackPageView() {
-    try {
-        window.Sprig('track', 'page_viewed', {
-            page: window.location.pathname,
-            referrer: document.referrer,
-            timestamp: new Date().toISOString()
-        });
-        
-        console.log('Sprig: Page view tracked');
-    } catch (e) {
-        console.error('Sprig: Error tracking page view', e);
-    }
-}
-
-// Set up all event handlers
-function setupEventHandlers() {
-    // Track category clicks
-    document.querySelectorAll('nav.categories a, .icon-item').forEach(item => {
-        item.addEventListener('click', function(e) {
-            e.preventDefault();
-            const category = this.dataset.category || this.textContent.trim();
-            trackEvent('category_clicked', { category: category });
-        });
-    });
+identifyButton.addEventListener('click', () => {
+    const entityType = userTypeSelect.value;
+    let entityId = entityIdInput.value.trim();
     
-    // Track product clicks
-    document.querySelectorAll('.product-card').forEach(product => {
-        product.addEventListener('click', function(e) {
-            if (!e.target.classList.contains('wishlist-button')) {
-                e.preventDefault();
-                const productId = this.dataset.productId;
-                const productName = this.querySelector('h3').textContent;
-                const productPrice = this.querySelector('.price').textContent;
-                
-                trackEvent('product_clicked', {
-                    product_id: productId,
-                    product_name: productName,
-                    product_price: productPrice
-                });
-                
-                // Simulate product page navigation
-                localStorage.setItem('lastViewedProduct', productId);
-                alert(`Viewing product: ${productName}`);
+    if (!entityId) {
+        entityId = generateRandomId();
+        entityIdInput.value = entityId;
+    }
+    
+    // Log identification
+    const logItem = document.createElement('li');
+    logItem.textContent = `[${new Date().toLocaleString()}] Identified ${entityType} ${entityId}`;
+    eventLogList.prepend(logItem);
+    
+    // Send to June.so analytics
+    try {
+        if (window.analytics && window.analytics.identify) {
+            const traits = {};
+            
+            if (entityType === 'user') {
+                traits.userType = 'individual';
+            } else if (entityType === 'group') {
+                traits.userType = 'group';
+                traits.groupId = entityId;
+            } else if (entityType === 'company') {
+                traits.userType = 'company';
+                traits.companyId = entityId;
             }
-        });
-    });
-    
-    // Track wishlist button clicks
-    document.querySelectorAll('.wishlist-button').forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.stopPropagation();
-            const productId = this.dataset.productId;
-            const productCard = this.closest('.product-card');
-            const productName = productCard.querySelector('h3').textContent;
             
-            this.classList.toggle('active');
-            const action = this.classList.contains('active') ? 'added_to_wishlist' : 'removed_from_wishlist';
-            
-            trackEvent(action, {
-                product_id: productId,
-                product_name: productName
-            });
-            
-            // Provide visual feedback
-            this.innerHTML = this.classList.contains('active') ? '♥' : '♡';
-        });
-    });
-    
-    // Track CTA button clicks
-    document.getElementById('shop-now').addEventListener('click', function() {
-        trackEvent('cta_clicked', { button: 'shop_now', location: 'hero_banner' });
-    });
-    
-    document.getElementById('check-it').addEventListener('click', function() {
-        trackEvent('cta_clicked', { button: 'check_it', location: 'promo_banner' });
-    });
-    
-    // Track newsletter subscription
-    document.getElementById('subscribe-btn').addEventListener('click', function() {
-        const emailInput = this.previousElementSibling;
-        const email = emailInput.value.trim();
-        
-        if (email && email.includes('@')) {
-            trackEvent('newsletter_subscribed', { email: email });
-            alert('Thank you for subscribing!');
-            emailInput.value = '';
-        } else {
-            alert('Please enter a valid email address');
+            window.analytics.identify(entityId, traits);
         }
-    });
-    
-    // Track user sign in
-    document.getElementById('sign-in').addEventListener('click', function(e) {
-        e.preventDefault();
-        trackEvent('sign_in_clicked');
-        
-        // Simulate sign in
-        const isSignedIn = localStorage.getItem('isSignedIn') === 'true';
-        
-        if (!isSignedIn) {
-            localStorage.setItem('isSignedIn', 'true');
-            alert('You are now signed in!');
-            
-            // Update user attributes
-            window.Sprig('set', 'is_signed_in', true);
-        } else {
-            localStorage.setItem('isSignedIn', 'false');
-            alert('You are now signed out.');
-            
-            // Update user attributes
-            window.Sprig('set', 'is_signed_in', false);
-        }
-    });
-    
-    // Track cart clicks
-    document.getElementById('cart').addEventListener('click', function(e) {
-        e.preventDefault();
-        trackEvent('cart_clicked');
-        
-        // Get cart items from localStorage
-        const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-        if (cart.length > 0) {
-            alert(`You have ${cart.length} items in your cart.`);
-        } else {
-            alert('Your cart is empty.');
-        }
-    });
-}
-
-// Generic event tracking function
-function trackEvent(eventName, properties = {}) {
-    try {
-        // Add standard properties
-        const eventProperties = {
-            ...properties,
-            timestamp: new Date().toISOString(),
-            page: window.location.pathname,
-            userId: localStorage.getItem('userId')
-        };
-        
-        // Track event in Sprig
-        window.Sprig('track', eventName, eventProperties);
-        
-        console.log(`Sprig: Event tracked - ${eventName}`, eventProperties);
     } catch (e) {
-        console.error(`Sprig: Error tracking event - ${eventName}`, e);
+        console.error('Error identifying with June.so:', e);
     }
-}
+});
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', () => {
+    entityIdInput.value = generateRandomId();
+    updateMetrics();
+    
+    // Track initial page view
+    setTimeout(() => {
+        const entityType = userTypeSelect.value;
+        const entityId = entityIdInput.value;
+        logEvent('Page View', entityType, entityId);
+    }, 1000);
+});
