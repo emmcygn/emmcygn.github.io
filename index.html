@@ -31,23 +31,63 @@
     <main>
         <section class="user-controls">
             <div class="control-panel">
-                <h2>User Simulation Panel</h2>
-                <div class="form-group">
-                    <label for="userType">Acting as:</label>
-                    <select id="userType">
-                        <option value="user">Individual User</option>
-                        <option value="group">Group Member</option>
-                        <option value="company">Company Member</option>
-                    </select>
+                <h2>User & Company Identification</h2>
+                
+                <div class="form-section">
+                    <h3>Identify User</h3>
+                    <div class="form-group">
+                        <label for="userId">User ID:</label>
+                        <input type="text" id="userId" placeholder="Enter User ID">
+                        <button id="generateUserId">Generate ID</button>
+                    </div>
+                    <div class="form-group">
+                        <label for="userEmail">Email:</label>
+                        <input type="email" id="userEmail" placeholder="user@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="userName">Name:</label>
+                        <input type="text" id="userName" placeholder="John Doe">
+                    </div>
+                    <div class="form-group">
+                        <label for="userAvatar">Avatar URL:</label>
+                        <input type="text" id="userAvatar" placeholder="https://example.com/avatar.png">
+                    </div>
+                    <button id="identifyUser" class="primary-button">Identify User</button>
                 </div>
-                <div class="form-group">
-                    <label for="entityId">Entity ID:</label>
-                    <input type="text" id="entityId" placeholder="Enter ID or generate random">
-                    <button id="generateId">Generate Random ID</button>
+                
+                <div class="form-section">
+                    <h3>Identify Company/Group</h3>
+                    <div class="form-group">
+                        <label for="groupId">Group ID:</label>
+                        <input type="text" id="groupId" placeholder="Enter Group ID">
+                        <button id="generateGroupId">Generate ID</button>
+                    </div>
+                    <div class="form-group">
+                        <label for="groupName">Company Name:</label>
+                        <input type="text" id="groupName" placeholder="Acme Inc">
+                    </div>
+                    <div class="form-group">
+                        <label for="groupAvatar">Company Logo URL:</label>
+                        <input type="text" id="groupAvatar" placeholder="https://example.com/logo.png">
+                    </div>
+                    <button id="identifyGroup" class="primary-button">Identify Company</button>
                 </div>
-                <div class="action-buttons">
-                    <button id="performEvent">Perform Random Event</button>
-                    <button id="identify">Identify User</button>
+                
+                <div class="form-section">
+                    <h3>Track Events</h3>
+                    <div class="form-group">
+                        <label for="eventName">Event Name:</label>
+                        <select id="eventName">
+                            <option value="Page View">Page View</option>
+                            <option value="Button Click">Button Click</option>
+                            <option value="Form Submit">Form Submit</option>
+                            <option value="Feature Used">Feature Used</option>
+                            <option value="Purchase">Purchase</option>
+                            <option value="Sign Up">Sign Up</option>
+                            <option value="Login">Login</option>
+                        </select>
+                    </div>
+                    <button id="trackEvent" class="primary-button">Track Event</button>
                 </div>
             </div>
         </section>
@@ -76,12 +116,12 @@
                     <p id="usageTrend">+0%</p>
                 </div>
                 <div class="metric-card">
-                    <h3>Total Seats</h3>
-                    <p id="totalSeats">0</p>
+                    <h3>Total Users</h3>
+                    <p id="totalUsers">0</p>
                 </div>
                 <div class="metric-card">
-                    <h3>Active Seats</h3>
-                    <p id="activeSeats">0</p>
+                    <h3>Active Users</h3>
+                    <p id="activeUsers">0</p>
                 </div>
             </div>
         </section>
@@ -95,7 +135,7 @@
     </main>
 
     <footer>
-        <p>This demo site simulates June.so analytics tracking. No real data is being displayed.</p>
+        <p>This demo site simulates June.so analytics tracking. Connected to your actual June.so account.</p>
     </footer>
 
     <script src="script.js"></script>
