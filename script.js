@@ -335,4 +335,193 @@ function identifyGroup(groupId, traits) {
     // Send to June.so analytics
     try {
         if (checkJuneConnection()) {
-            window.
+            window.analytics.group(groupId, traits, () => {
+                console.log('Group callback executed');
+            });
+            console.log(`Identified group ${groupId}`, traits);
+            logToUI(`Successfully sent company identification to June.so`, 'success');
+        } else {
+            logToUI(`Simulated company identification locally (June.so connection unavailable)`, 'error');
+        }
+    } catch (e) {
+        console.error('Error identifying group with June.so:', e);
+        logToUI(`Error: Failed to identify company with June.so: ${e.message}`, 'error');
+    }
+    
+    // Update UI
+    updateMetrics();
+}
+
+// Event listeners
+generateUserIdButton.addEventListener('click', () => {
+    userIdInput.value = generateRandomId();
+    userNameInput.value = generateRandomName();
+    userEmailInput.value = generateRandomEmail(userNameInput.value);
+});
+
+generateGroupIdButton.addEventListener('click', () => {
+    groupIdInput.value = generateRandomId();
+    groupNameInput.value = generateRandomCompanyName();
+    groupIndustryInput.value = generateRandomIndustry();
+});
+
+identifyUserButton.addEventListener('click', () => {
+    const userId = userIdInput.value.trim();
+    const email = userEmailInput.value.trim();
+    const name = userNameInput.value.trim();
+    
+    if (!userId) {
+        logToUI('Error: User ID is required', 'error');
+        return;
+    }
+    
+    if (!email) {
+        logToUI('Error: Email is required', 'error');
+        return;
+    }
+    
+    const traits = {
+        email: email
+    };
+    
+    if (name) traits.name = name;
+    
+    identifyUser(userId, traits);
+});
+
+identifyGroupButton.addEventListener('click', () => {
+    const groupId = groupIdInput.value.trim();
+    const name = groupNameInput.value.trim();
+    const industry = groupIndustryInput.value.trim();
+    
+    if (!groupId) {
+        logToUI('Error: Group/Company ID is required', 'error');
+        return;
+    }
+    
+    const traits = {};
+    
+    if (name) traits.name = name;
+    if (industry) traits.industry = industry;
+    
+    identifyGroup(groupId, traits);
+});
+
+trackEventButton.addEventListener('click', () => {
+    const eventName = eventNameSelect.value;
+    let properties = {};
+    
+    // Try to parse properties from the textarea
+    try {
+        const propertiesText = eventPropertiesInput.value.trim();
+        if (propertiesText) {
+            properties = JSON.parse(propertiesText);
+        }
+    } catch (e) {
+        logToUI(`Error parsing properties JSON: ${e.message}`, 'error');
+        return;
+    }
+    
+    trackEvent(eventName, properties);
+});
+
+clearLogButton.addEventListener('click', () => {
+    eventLogList.innerHTML = '';
+    logToUI('Event log cleared');
+});
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', () => {
+    // Generate random IDs and names
+    userIdInput.value = generateRandomId();
+    userNameInput.value = generateRandomName();
+    userEmailInput.value = generateRandomEmail(userNameInput.value);
+    groupIdInput.value = generateRandomId();
+    groupNameInput.value = generateRandomCompanyName();
+    groupIndustryInput.value = generateRandomIndustry();
+    
+    // Initialize metrics
+    updateMetrics();
+    
+    // Check connection with a delay to allow script to load
+    setTimeout(() => {
+        checkJuneConnection();
+    }, 2000);
+    
+    // Log page load
+    logToUI('Page loaded. Ready to identify users and track events.');
+    
+    // Add example properties to the properties textarea
+    const defaultProperties = {
+        browser: navigator.userAgent.includes('Chrome') ? 'chrome' : 
+                 navigator.userAgent.includes('Firefox') ? 'firefox' : 
+                 navigator.userAgent.includes('Safari') ? 'safari' : 'other'
+    };
+    
+    eventPropertiesInput.value = JSON.stringify(defaultProperties, null, 2);
+    
+    // Auto track page view with page() method
+    try {
+        if (window.analytics && window.analytics.page) {
+            // Page view is already tracked in the June.so initialization script
+            logToUI('Page view automatically tracked on load');
+        }
+    } catch (e) {
+        console.error('Error tracking page view:', e);
+    }
+});
+
+// Function to add a test event for quick testing
+function addTestEvent() {
+    // Only if we already have a user identified
+    if (simulationData.currentUserId) {
+        const testEvents = [
+            'Page Viewed',
+            'Button Clicked',
+            'Form Submitted',
+            'Feature Used'
+        ];
+        
+        const randomEvent = testEvents[Math.floor(Math.random() * testEvents.length)];
+        const randomProperties = {
+            timestamp: new Date().toISOString(),
+            randomValue: Math.floor(Math.random() * 100)
+        };
+        
+        trackEvent(randomEvent, randomProperties);
+    }
+}
+
+// Add keyboard shortcuts for convenience
+document.addEventListener('keydown', (e) => {
+    // Alt+1: Identify User
+    if (e.altKey && e.key === '1') {
+        identifyUserButton.click();
+    }
+    
+    // Alt+2: Identify Group
+    if (e.altKey && e.key === '2') {
+        identifyGroupButton.click();
+    }
+    
+    // Alt+3: Track Event
+    if (e.altKey && e.key === '3') {
+        trackEventButton.click();
+    }
+    
+    // Alt+R: Generate Random IDs
+    if (e.altKey && e.key === 'r') {
+        generateUserIdButton.click();
+        generateGroupIdButton.click();
+    }
+    
+    // Alt+T: Add Test Event
+    if (e.altKey && e.key === 't') {
+        addTestEvent();
+    }
+    
+    // Alt+C: Clear Log
+    if (e.altKey && e.key === 'c') {
+        clearLogButton.click();
+    }
+});
