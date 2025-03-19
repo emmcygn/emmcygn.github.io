@@ -3,23 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>June.so Demo Site</title>
+    <title>June.so Analytics Demo</title>
     <link rel="stylesheet" href="style.css">
-    <!-- June.so Analytics Script -->
+    
+    <!-- June.so Analytics Script - Exactly as per documentation -->
     <script>
-        window.analytics = {};
-        function juneify(writeKey) {
-            window.analytics._writeKey = writeKey;
-            var script = document.createElement("script");
-            script.type = "application/javascript";
-            script.onload = function () {
-                window.analytics.page();
-            }
-            script.src = "https://unpkg.com/@june-so/analytics-next/dist/umd/standalone.js";
-            var first = document.getElementsByTagName('script')[0];
-            first.parentNode.insertBefore(script, first);
-        }
-        juneify("wk-e6a94ab83c694366988ba3ada65b4855");
+      window.analytics = {};
+      function juneify(writeKey) {
+        window.analytics._writeKey = writeKey;
+        var script = document.createElement('script');
+        script.type = 'application/javascript';
+        script.onload = function () {
+          window.analytics.page();
+        };
+        script.src = 'https://unpkg.com/@june-so/analytics-next/dist/umd/standalone.js';
+        var first = document.getElementsByTagName('script')[0];
+        first.parentNode.insertBefore(script, first);
+      }
+      juneify('wk-e6a94ab83c694366988ba3ada65b4855');
     </script>
 </head>
 <body>
@@ -29,66 +30,81 @@
     </header>
     
     <main>
-        <section class="user-controls">
-            <div class="control-panel">
-                <h2>User & Company Identification</h2>
-                
-                <div class="form-section">
-                    <h3>Identify User</h3>
-                    <div class="form-group">
-                        <label for="userId">User ID:</label>
+        <section class="connection-status">
+            <h2>Connection Status</h2>
+            <div class="status-wrapper">
+                <div id="connectionStatus" class="status-pending">Checking June.so connection...</div>
+            </div>
+        </section>
+        
+        <section class="user-identify">
+            <h2>1. Identify User</h2>
+            <div class="form-container">
+                <div class="form-group">
+                    <label for="userId">User ID:</label>
+                    <div class="input-with-button">
                         <input type="text" id="userId" placeholder="Enter User ID">
-                        <button id="generateUserId">Generate ID</button>
+                        <button id="generateUserId">Generate</button>
                     </div>
-                    <div class="form-group">
-                        <label for="userEmail">Email:</label>
-                        <input type="email" id="userEmail" placeholder="user@example.com">
-                    </div>
-                    <div class="form-group">
-                        <label for="userName">Name:</label>
-                        <input type="text" id="userName" placeholder="John Doe">
-                    </div>
-                    <div class="form-group">
-                        <label for="userAvatar">Avatar URL:</label>
-                        <input type="text" id="userAvatar" placeholder="https://example.com/avatar.png">
-                    </div>
-                    <button id="identifyUser" class="primary-button">Identify User</button>
                 </div>
-                
-                <div class="form-section">
-                    <h3>Identify Company/Group</h3>
-                    <div class="form-group">
-                        <label for="groupId">Group ID:</label>
+                <div class="form-group">
+                    <label for="userEmail">Email:</label>
+                    <input type="email" id="userEmail" placeholder="user@example.com">
+                </div>
+                <div class="form-group">
+                    <label for="userName">Name:</label>
+                    <input type="text" id="userName" placeholder="John Doe">
+                </div>
+                <button id="identifyUser" class="primary-button">Identify User</button>
+            </div>
+        </section>
+        
+        <section class="group-identify">
+            <h2>2. Identify Company/Group</h2>
+            <div class="form-container">
+                <div class="form-group">
+                    <label for="groupId">Group ID:</label>
+                    <div class="input-with-button">
                         <input type="text" id="groupId" placeholder="Enter Group ID">
-                        <button id="generateGroupId">Generate ID</button>
+                        <button id="generateGroupId">Generate</button>
                     </div>
-                    <div class="form-group">
-                        <label for="groupName">Company Name:</label>
-                        <input type="text" id="groupName" placeholder="Acme Inc">
-                    </div>
-                    <div class="form-group">
-                        <label for="groupAvatar">Company Logo URL:</label>
-                        <input type="text" id="groupAvatar" placeholder="https://example.com/logo.png">
-                    </div>
-                    <button id="identifyGroup" class="primary-button">Identify Company</button>
                 </div>
-                
-                <div class="form-section">
-                    <h3>Track Events</h3>
-                    <div class="form-group">
-                        <label for="eventName">Event Name:</label>
-                        <select id="eventName">
-                            <option value="Page View">Page View</option>
-                            <option value="Button Click">Button Click</option>
-                            <option value="Form Submit">Form Submit</option>
-                            <option value="Feature Used">Feature Used</option>
-                            <option value="Purchase">Purchase</option>
-                            <option value="Sign Up">Sign Up</option>
-                            <option value="Login">Login</option>
-                        </select>
-                    </div>
-                    <button id="trackEvent" class="primary-button">Track Event</button>
+                <div class="form-group">
+                    <label for="groupName">Company Name:</label>
+                    <input type="text" id="groupName" placeholder="Acme Inc">
                 </div>
+                <div class="form-group">
+                    <label for="groupIndustry">Industry:</label>
+                    <input type="text" id="groupIndustry" placeholder="Technology">
+                </div>
+                <button id="identifyGroup" class="primary-button">Identify Company</button>
+            </div>
+        </section>
+        
+        <section class="track-events">
+            <h2>3. Track Events</h2>
+            <div class="form-container">
+                <div class="form-group">
+                    <label for="eventName">Event Name:</label>
+                    <select id="eventName">
+                        <option value="Page Viewed">Page Viewed</option>
+                        <option value="Button Clicked">Button Clicked</option>
+                        <option value="Form Submitted">Form Submitted</option>
+                        <option value="Feature Used">Feature Used</option>
+                        <option value="Item Purchased">Item Purchased</option>
+                        <option value="User Signed Up">User Signed Up</option>
+                        <option value="User Logged In">User Logged In</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="eventProperties">Properties (JSON):</label>
+                    <textarea id="eventProperties" placeholder='{"property": "value"}'></textarea>
+                </div>
+                <div class="group-checkbox">
+                    <input type="checkbox" id="includeGroup" checked>
+                    <label for="includeGroup">Include Group ID (if available)</label>
+                </div>
+                <button id="trackEvent" class="primary-button">Track Event</button>
             </div>
         </section>
 
@@ -96,7 +112,7 @@
             <h2>Simulated Metrics</h2>
             <div class="metrics-grid">
                 <div class="metric-card">
-                    <h3>Total Events Performed</h3>
+                    <h3>Total Events</h3>
                     <p id="totalEvents">0</p>
                 </div>
                 <div class="metric-card">
@@ -115,27 +131,42 @@
                     <h3>Usage Trend</h3>
                     <p id="usageTrend">+0%</p>
                 </div>
-                <div class="metric-card">
-                    <h3>Total Users</h3>
-                    <p id="totalUsers">0</p>
-                </div>
-                <div class="metric-card">
-                    <h3>Active Users</h3>
-                    <p id="activeUsers">0</p>
-                </div>
             </div>
         </section>
 
         <section class="event-log">
             <h2>Event Log</h2>
             <div class="log-container">
+                <div class="log-actions">
+                    <button id="clearLog">Clear Log</button>
+                </div>
                 <ul id="eventLog"></ul>
+            </div>
+        </section>
+        
+        <section class="troubleshooting">
+            <h2>Troubleshooting</h2>
+            <div class="troubleshooting-tips">
+                <p>If you're experiencing connection issues:</p>
+                <ul>
+                    <li>Check that your write key is correct</li>
+                    <li>Verify that your June.so account is active</li>
+                    <li>Try accessing the site without content blockers</li>
+                    <li>Check browser console for detailed error messages</li>
+                </ul>
+                <p>If you're seeing <code>ERR_CONNECTION_REFUSED</code> errors, this may indicate:</p>
+                <ul>
+                    <li>Your browser cannot reach the June.so servers</li>
+                    <li>There might be a network firewall blocking the connection</li>
+                    <li>The June.so service might be temporarily unavailable</li>
+                </ul>
             </div>
         </section>
     </main>
 
     <footer>
-        <p>This demo site simulates June.so analytics tracking. Connected to your actual June.so account.</p>
+        <p>This demo site implements June.so analytics tracking using the official Browser SDK.</p>
+        <p>API Key: <code id="currentApiKey">wk-e6a94ab83c694366988ba3ada65b4855</code></p>
     </footer>
 
     <script src="script.js"></script>
