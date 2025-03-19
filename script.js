@@ -15,10 +15,8 @@ const simulationData = {
 const userIdInput = document.getElementById('userId');
 const userEmailInput = document.getElementById('userEmail');
 const userNameInput = document.getElementById('userName');
-const userAvatarInput = document.getElementById('userAvatar');
 const groupIdInput = document.getElementById('groupId');
 const groupNameInput = document.getElementById('groupName');
-const groupAvatarInput = document.getElementById('groupAvatar');
 const eventNameSelect = document.getElementById('eventName');
 
 const generateUserIdButton = document.getElementById('generateUserId');
@@ -27,6 +25,7 @@ const identifyUserButton = document.getElementById('identifyUser');
 const identifyGroupButton = document.getElementById('identifyGroup');
 const trackEventButton = document.getElementById('trackEvent');
 const eventLogList = document.getElementById('eventLog');
+const connectionStatusDisplay = document.getElementById('connectionStatus');
 
 // Metric displays
 const totalEventsDisplay = document.getElementById('totalEvents');
@@ -34,8 +33,6 @@ const activeDaysDisplay = document.getElementById('activeDays');
 const firstSeenDisplay = document.getElementById('firstSeen');
 const lastSeenDisplay = document.getElementById('lastSeen');
 const usageTrendDisplay = document.getElementById('usageTrend');
-const totalUsersDisplay = document.getElementById('totalUsers');
-const activeUsersDisplay = document.getElementById('activeUsers');
 
 // Generate a random ID
 function generateRandomId() {
@@ -81,11 +78,23 @@ function formatDate(date) {
     return new Date(date).toLocaleString();
 }
 
+// Check June.so connection
+function checkJuneConnection() {
+    if (!window.analytics || typeof window.analytics.track !== 'function') {
+        connectionStatusDisplay.textContent = 'June.so Not Connected';
+        connectionStatusDisplay.parentElement.classList.add('status-error');
+        return false;
+    }
+    
+    connectionStatusDisplay.textContent = 'June.so Connected';
+    connectionStatusDisplay.parentElement.classList.add('status-success');
+    return true;
+}
+
 // Update metrics displays
 function updateMetrics() {
-    // Count users and active users
+    // Count users
     const userCount = Object.keys(simulationData.users).length;
-    const groupCount = Object.keys(simulationData.groups).length;
     
     // Count active users (had events in the last 30 days)
     const now = new Date();
@@ -108,8 +117,6 @@ function updateMetrics() {
     
     // Update displays
     totalEventsDisplay.textContent = simulationData.totalEvents;
-    totalUsersDisplay.textContent = userCount;
-    activeUsersDisplay.textContent = activeUsers;
     
     // Calculate active days for current user
     let activeDays = 0;
@@ -126,9 +133,17 @@ function updateMetrics() {
 }
 
 // Log an event to the UI
-function logToUI(message) {
+function logToUI(message, isError = false) {
+    const now = new Date();
+    const timestamp = now.toLocaleString();
+    
     const logItem = document.createElement('li');
-    logItem.textContent = `[${new Date().toLocaleString()}] ${message}`;
+    logItem.textContent = `[${timestamp}] ${message}`;
+    
+    if (isError) {
+        logItem.style.color = '#c62828';
+    }
+    
     eventLogList.prepend(logItem);
 }
 
@@ -140,7 +155,7 @@ function trackEvent(eventName) {
     
     // Check if we have an identified user
     if (!userId) {
-        alert('Please identify a user first before tracking events');
+        logToUI('Error: Please identify a user first before tracking events', true);
         return;
     }
     
@@ -182,19 +197,31 @@ function trackEvent(eventName) {
     
     // Send to June.so analytics
     try {
-        if (window.analytics && window.analytics.track) {
-            const properties = {};
+        if (checkJuneConnection()) {
+            const properties = {
+                browser: navigator.userAgent.includes('Chrome') ? 'chrome' : 
+                         navigator.userAgent.includes('Firefox') ? 'firefox' : 
+                         navigator.userAgent.includes('Safari') ? 'safari' : 'other'
+            };
             
-            if (groupId) {
-                properties.groupId = groupId;
+            // If we have a group ID, add it to context as per documentation
+            const options = groupId ? { context: { groupId: groupId } } : null;
+            
+            if (options) {
+                window.analytics.track(eventName, properties, options);
+                console.log(`Tracked event "${eventName}" for user ${userId} in group ${groupId}`, properties, options);
+            } else {
+                window.analytics.track(eventName, properties);
+                console.log(`Tracked event "${eventName}" for user ${userId}`, properties);
             }
             
-            window.analytics.track(eventName, properties);
-            console.log(`Tracked event "${eventName}" for user ${userId}`);
+            logToUI(`Successfully sent "${eventName}" event to June.so`);
+        } else {
+            logToUI(`Simulated event "${eventName}" locally (June.so connection unavailable)`, true);
         }
     } catch (e) {
         console.error('Error tracking event with June.so:', e);
-        logToUI(`Error: Failed to track event with June.so: ${e.message}`);
+        logToUI(`Error: Failed to track event with June.so: ${e.message}`, true);
     }
     
     // Update UI
@@ -228,13 +255,16 @@ function identifyUser(userId, traits) {
     
     // Send to June.so analytics
     try {
-        if (window.analytics && window.analytics.identify) {
+        if (checkJuneConnection()) {
             window.analytics.identify(userId, traits);
             console.log(`Identified user ${userId}`, traits);
+            logToUI(`Successfully sent user identification to June.so`);
+        } else {
+            logToUI(`Simulated user identification locally (June.so connection unavailable)`, true);
         }
     } catch (e) {
         console.error('Error identifying user with June.so:', e);
-        logToUI(`Error: Failed to identify user with June.so: ${e.message}`);
+        logToUI(`Error: Failed to identify user with June.so: ${e.message}`, true);
     }
     
     // Update UI
@@ -245,7 +275,7 @@ function identifyUser(userId, traits) {
 function identifyGroup(groupId, traits) {
     // Make sure we have an identified user first
     if (!simulationData.currentUserId) {
-        alert('Please identify a user first before identifying a company');
+        logToUI('Error: Please identify a user first before identifying a company', true);
         return;
     }
     
@@ -278,13 +308,16 @@ function identifyGroup(groupId, traits) {
     
     // Send to June.so analytics
     try {
-        if (window.analytics && window.analytics.group) {
+        if (checkJuneConnection()) {
             window.analytics.group(groupId, traits);
             console.log(`Identified group ${groupId}`, traits);
+            logToUI(`Successfully sent company identification to June.so`);
+        } else {
+            logToUI(`Simulated company identification locally (June.so connection unavailable)`, true);
         }
     } catch (e) {
         console.error('Error identifying group with June.so:', e);
-        logToUI(`Error: Failed to identify company with June.so: ${e.message}`);
+        logToUI(`Error: Failed to identify company with June.so: ${e.message}`, true);
     }
     
     // Update UI
@@ -298,72 +331,4 @@ generateUserIdButton.addEventListener('click', () => {
     userEmailInput.value = generateRandomEmail(userNameInput.value);
 });
 
-generateGroupIdButton.addEventListener('click', () => {
-    groupIdInput.value = generateRandomId();
-    groupNameInput.value = generateRandomCompanyName();
-});
-
-identifyUserButton.addEventListener('click', () => {
-    const userId = userIdInput.value.trim();
-    const email = userEmailInput.value.trim();
-    const name = userNameInput.value.trim();
-    const avatar = userAvatarInput.value.trim();
-    
-    if (!userId) {
-        alert('User ID is required');
-        return;
-    }
-    
-    if (!email) {
-        alert('Email is required');
-        return;
-    }
-    
-    const traits = {
-        email: email
-    };
-    
-    if (name) traits.name = name;
-    if (avatar) traits.avatar = avatar;
-    
-    identifyUser(userId, traits);
-});
-
-identifyGroupButton.addEventListener('click', () => {
-    const groupId = groupIdInput.value.trim();
-    const name = groupNameInput.value.trim();
-    const avatar = groupAvatarInput.value.trim();
-    
-    if (!groupId) {
-        alert('Group/Company ID is required');
-        return;
-    }
-    
-    const traits = {};
-    
-    if (name) traits.name = name;
-    if (avatar) traits.avatar = avatar;
-    
-    identifyGroup(groupId, traits);
-});
-
-trackEventButton.addEventListener('click', () => {
-    const eventName = eventNameSelect.value;
-    trackEvent(eventName);
-});
-
-// Initialize on page load
-document.addEventListener('DOMContentLoaded', () => {
-    // Generate random IDs and names
-    userIdInput.value = generateRandomId();
-    userNameInput.value = generateRandomName();
-    userEmailInput.value = generateRandomEmail(userNameInput.value);
-    groupIdInput.value = generateRandomId();
-    groupNameInput.value = generateRandomCompanyName();
-    
-    // Initialize metrics
-    updateMetrics();
-    
-    // Log page load
-    logToUI('Page loaded. Ready to identify users and track events.');
-});
+generateG
