@@ -17,13 +17,17 @@ const userEmailInput = document.getElementById('userEmail');
 const userNameInput = document.getElementById('userName');
 const groupIdInput = document.getElementById('groupId');
 const groupNameInput = document.getElementById('groupName');
+const groupIndustryInput = document.getElementById('groupIndustry');
 const eventNameSelect = document.getElementById('eventName');
+const eventPropertiesInput = document.getElementById('eventProperties');
+const includeGroupCheckbox = document.getElementById('includeGroup');
 
 const generateUserIdButton = document.getElementById('generateUserId');
 const generateGroupIdButton = document.getElementById('generateGroupId');
 const identifyUserButton = document.getElementById('identifyUser');
 const identifyGroupButton = document.getElementById('identifyGroup');
 const trackEventButton = document.getElementById('trackEvent');
+const clearLogButton = document.getElementById('clearLog');
 const eventLogList = document.getElementById('eventLog');
 const connectionStatusDisplay = document.getElementById('connectionStatus');
 
@@ -72,22 +76,38 @@ function generateRandomCompanyName() {
     return `${prefix} ${suffix}`;
 }
 
+// Generate random industry
+function generateRandomIndustry() {
+    const industries = ['Technology', 'Healthcare', 'Finance', 'Education', 'Retail', 'Manufacturing', 'Media', 'Transportation', 'Energy', 'Entertainment'];
+    return industries[Math.floor(Math.random() * industries.length)];
+}
+
 // Format date for display
 function formatDate(date) {
     if (!date) return 'Never';
     return new Date(date).toLocaleString();
 }
 
+// Parse JSON safely
+function safeJSONParse(str) {
+    try {
+        return str ? JSON.parse(str) : {};
+    } catch (e) {
+        logToUI(`Error parsing JSON: ${e.message}`, 'error');
+        return {};
+    }
+}
+
 // Check June.so connection
 function checkJuneConnection() {
     if (!window.analytics || typeof window.analytics.track !== 'function') {
         connectionStatusDisplay.textContent = 'June.so Not Connected';
-        connectionStatusDisplay.parentElement.classList.add('status-error');
+        connectionStatusDisplay.className = 'status-error';
         return false;
     }
     
     connectionStatusDisplay.textContent = 'June.so Connected';
-    connectionStatusDisplay.parentElement.classList.add('status-success');
+    connectionStatusDisplay.className = 'status-success';
     return true;
 }
 
@@ -133,29 +153,30 @@ function updateMetrics() {
 }
 
 // Log an event to the UI
-function logToUI(message, isError = false) {
+function logToUI(message, type = 'info') {
     const now = new Date();
     const timestamp = now.toLocaleString();
     
     const logItem = document.createElement('li');
     logItem.textContent = `[${timestamp}] ${message}`;
-    
-    if (isError) {
-        logItem.style.color = '#c62828';
-    }
+    logItem.className = `log-${type}`;
     
     eventLogList.prepend(logItem);
+    
+    // Auto scroll to top of log
+    eventLogList.scrollTop = 0;
 }
 
 // Track an event and update simulation data
-function trackEvent(eventName) {
+function trackEvent(eventName, properties = {}) {
     const now = new Date();
     const userId = simulationData.currentUserId;
     const groupId = simulationData.currentGroupId;
+    const includeGroup = includeGroupCheckbox.checked;
     
     // Check if we have an identified user
     if (!userId) {
-        logToUI('Error: Please identify a user first before tracking events', true);
+        logToUI('Error: Please identify a user first before tracking events', 'error');
         return;
     }
     
@@ -190,7 +211,7 @@ function trackEvent(eventName) {
     
     // Log to UI
     let eventMessage = `User ${userId} performed "${eventName}"`;
-    if (groupId) {
+    if (groupId && includeGroup) {
         eventMessage += ` in company ${groupId}`;
     }
     logToUI(eventMessage);
@@ -198,30 +219,33 @@ function trackEvent(eventName) {
     // Send to June.so analytics
     try {
         if (checkJuneConnection()) {
-            const properties = {
-                browser: navigator.userAgent.includes('Chrome') ? 'chrome' : 
-                         navigator.userAgent.includes('Firefox') ? 'firefox' : 
-                         navigator.userAgent.includes('Safari') ? 'safari' : 'other'
-            };
-            
-            // If we have a group ID, add it to context as per documentation
-            const options = groupId ? { context: { groupId: groupId } } : null;
+            // Prepare options object if groupId is available and checkbox is checked
+            let options = null;
+            if (groupId && includeGroup) {
+                options = { context: { groupId: groupId } };
+            }
             
             if (options) {
-                window.analytics.track(eventName, properties, options);
+                // Track with groupId context
+                window.analytics.track(eventName, properties, options, () => {
+                    console.log('Track event callback executed');
+                });
                 console.log(`Tracked event "${eventName}" for user ${userId} in group ${groupId}`, properties, options);
             } else {
-                window.analytics.track(eventName, properties);
+                // Track without groupId context
+                window.analytics.track(eventName, properties, () => {
+                    console.log('Track event callback executed');
+                });
                 console.log(`Tracked event "${eventName}" for user ${userId}`, properties);
             }
             
-            logToUI(`Successfully sent "${eventName}" event to June.so`);
+            logToUI(`Successfully sent "${eventName}" event to June.so`, 'success');
         } else {
-            logToUI(`Simulated event "${eventName}" locally (June.so connection unavailable)`, true);
+            logToUI(`Simulated event "${eventName}" locally (June.so connection unavailable)`, 'error');
         }
     } catch (e) {
         console.error('Error tracking event with June.so:', e);
-        logToUI(`Error: Failed to track event with June.so: ${e.message}`, true);
+        logToUI(`Error: Failed to track event with June.so: ${e.message}`, 'error');
     }
     
     // Update UI
@@ -256,15 +280,17 @@ function identifyUser(userId, traits) {
     // Send to June.so analytics
     try {
         if (checkJuneConnection()) {
-            window.analytics.identify(userId, traits);
+            window.analytics.identify(userId, traits, () => {
+                console.log('Identify callback executed');
+            });
             console.log(`Identified user ${userId}`, traits);
-            logToUI(`Successfully sent user identification to June.so`);
+            logToUI(`Successfully sent user identification to June.so`, 'success');
         } else {
-            logToUI(`Simulated user identification locally (June.so connection unavailable)`, true);
+            logToUI(`Simulated user identification locally (June.so connection unavailable)`, 'error');
         }
     } catch (e) {
         console.error('Error identifying user with June.so:', e);
-        logToUI(`Error: Failed to identify user with June.so: ${e.message}`, true);
+        logToUI(`Error: Failed to identify user with June.so: ${e.message}`, 'error');
     }
     
     // Update UI
@@ -275,7 +301,7 @@ function identifyUser(userId, traits) {
 function identifyGroup(groupId, traits) {
     // Make sure we have an identified user first
     if (!simulationData.currentUserId) {
-        logToUI('Error: Please identify a user first before identifying a company', true);
+        logToUI('Error: Please identify a user first before identifying a company', 'error');
         return;
     }
     
@@ -309,26 +335,4 @@ function identifyGroup(groupId, traits) {
     // Send to June.so analytics
     try {
         if (checkJuneConnection()) {
-            window.analytics.group(groupId, traits);
-            console.log(`Identified group ${groupId}`, traits);
-            logToUI(`Successfully sent company identification to June.so`);
-        } else {
-            logToUI(`Simulated company identification locally (June.so connection unavailable)`, true);
-        }
-    } catch (e) {
-        console.error('Error identifying group with June.so:', e);
-        logToUI(`Error: Failed to identify company with June.so: ${e.message}`, true);
-    }
-    
-    // Update UI
-    updateMetrics();
-}
-
-// Event listeners
-generateUserIdButton.addEventListener('click', () => {
-    userIdInput.value = generateRandomId();
-    userNameInput.value = generateRandomName();
-    userEmailInput.value = generateRandomEmail(userNameInput.value);
-});
-
-generateG
+            window.
