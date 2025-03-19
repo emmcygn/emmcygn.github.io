@@ -3,210 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ShopSmart</title>
-    <style>
-        /* Inline styles to avoid loading issues */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
+    <title>June.so Demo Site</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- June.so Analytics Script -->
+    <script>
+        window.analytics = {};
+        function juneify(writeKey) {
+            window.analytics._writeKey = writeKey;
+            var script = document.createElement("script");
+            script.type = "application/javascript";
+            script.onload = function () {
+                window.analytics.page();
+            }
+            script.src = "https://unpkg.com/@june-so/analytics-next/dist/umd/standalone.js";
+            var first = document.getElementsByTagName('script')[0];
+            first.parentNode.insertBefore(script, first);
         }
-        .logo {
-            font-weight: bold;
-            font-size: 24px;
-            margin-bottom: 10px;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .search-box {
-            padding: 5px;
-            width: 200px;
-        }
-        .links {
-            margin-bottom: 20px;
-        }
-        .links a {
-            margin-right: 10px;
-        }
-        .banner {
-            background-color: #f0f0f0;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-        .button {
-            background-color: #4CAF50;
-            border: none;
-            color: white;
-            padding: 10px 15px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            margin: 10px 0;
-            cursor: pointer;
-        }
-        .categories {
-            margin-bottom: 20px;
-        }
-        .categories div {
-            margin-bottom: 10px;
-        }
-        .product-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-        .product {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: center;
-        }
-        .product-title {
-            font-weight: bold;
-            margin: 10px 0;
-        }
-        .price {
-            color: #4CAF50;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-    </style>
-    
-    <!-- Sprig SDK installation - exactly as provided -->
-    <script type="text/javascript">
-    (function(l,e,a,p) {
-        if (window.Sprig) return;
-        window.Sprig = function(){S._queue.push(arguments)}
-        var S = window.Sprig;S.appId = a;S._queue = [];window.UserLeap=S;
-        a=l.createElement('script');
-        a.async=1;a.src=e+'?id='+S.appId;
-        p=l.getElementsByTagName('script')[0];
-        p.parentNode.insertBefore(a, p);
-    })(document, 'https://cdn.sprig.com/shim.js', 'wNCnFzlYP6nr');
+        juneify("wk-e6a94ab83c694366988ba3ada65b4855");
     </script>
 </head>
 <body>
-    <div class="header">
-        <a href="#" class="logo">S ShopSmart</a>
-        <form>
-            <input type="text" placeholder="Search for products..." class="search-box">
-            <button type="submit">🔍</button>
-        </form>
-    </div>
+    <header>
+        <h1>June.so Analytics Demo</h1>
+        <p>A simple website to simulate June.so analytics metrics</p>
+    </header>
     
-    <div class="links">
-        <a href="#" id="sign-in">Sign in</a>
-        <a href="#" id="wishlist">Wishlist</a>
-        <a href="#" id="cart">My cart</a>
-    </div>
-    
-    <ul class="categories">
-        <li><a href="#" data-category="all">Categories</a></li>
-        <li><a href="#" data-category="hot-deals">Hot offers</a></li>
-        <li><a href="#" data-category="gift-boxes">Gift boxes</a></li>
-        <li><a href="#" data-category="projects">Projects</a></li>
-        <li><a href="#" data-category="menu-items">Menu item</a></li>
-        <li><a href="#" data-category="others">Others</a></li>
-    </ul>
-    
-    <div class="banner">
-        <h1>Best Deals on Electronics</h1>
-        <p>Limited time sale for products</p>
-        <button class="button" id="shop-now">SHOP NOW</button>
-    </div>
-    
-    <div class="categories">
-        <div><a href="#" data-category="equipment">💻 Equipment</a></div>
-        <div><a href="#" data-category="jewelry">💎 Jewellery</a></div>
-        <div><a href="#" data-category="mens">👔 Men's wear</a></div>
-        <div><a href="#" data-category="ladies">👗 Ladies' wear</a></div>
-        <div><a href="#" data-category="auto">🚗 Automobiles</a></div>
-        <div><a href="#" data-category="home">🏠 Home items</a></div>
-        <div><a href="#" data-category="kids">🧸 Kids toys</a></div>
-        <div><a href="#" data-category="accessories">⌚ Accessories</a></div>
-    </div>
-    
-    <h2>New products</h2>
-    <div class="product-grid">
-        <div class="product" data-product-id="1">
-            <div class="product-badge">NEW</div>
-            <div>👕 T-Shirt</div>
-            <div class="product-title">Men's T-shirt Cotton Basic</div>
-            <div class="price">$29.50</div>
-            <button class="add-to-cart">Add to Cart</button>
-        </div>
-        
-        <div class="product" data-product-id="2">
-            <div class="product-badge">NEW</div>
-            <div>👕 Blue Shirt</div>
-            <div class="product-title">T-shirt Blue cotton</div>
-            <div class="price">$39.50</div>
-            <button class="add-to-cart">Add to Cart</button>
-        </div>
-        
-        <div class="product" data-product-id="3">
-            <div class="product-badge">NEW</div>
-            <div>🧥 Jacket</div>
-            <div class="product-title">Warm Winter Jacket</div>
-            <div class="price">$59.50</div>
-            <button class="add-to-cart">Add to Cart</button>
-        </div>
-        
-        <div class="product" data-product-id="4">
-            <div>👖 Jeans</div>
-            <div class="product-title">Men's Denim Textile Jeans</div>
-            <div class="price">$35.50</div>
-            <button class="add-to-cart">Add to Cart</button>
-        </div>
-    </div>
-    
-    <!-- Additional section for promotion -->
-    <div class="banner">
-        <h2>Great place for promo banners and ads</h2>
-        <button class="button" id="check-it">CHECK IT</button>
-    </div>
-    
-    <h2>Recommended</h2>
-    <div class="product-grid">
-        <div class="product" data-product-id="5">
-            <div class="product-badge">SALE</div>
-            <div>🎧 Headphones</div>
-            <div class="product-title">Gaming Headset with Mic</div>
-            <div class="price">$89.50</div>
-            <button class="add-to-cart">Add to Cart</button>
-        </div>
-        
-        <div class="product" data-product-id="6">
-            <div class="product-badge">SALE</div>
-            <div>⌚ Smartwatch</div>
-            <div class="product-title">Sport Smart Watch (brushed)</div>
-            <div class="price">$99.50</div>
-            <button class="add-to-cart">Add to Cart</button>
-        </div>
-        
-        <div class="product" data-product-id="7">
-            <div class="product-badge">SALE</div>
-            <div>📱 iPhone</div>
-            <div class="product-title">Apple iPhone 12 Pro, 512GB</div>
-            <div class="price">$979.90</div>
-            <button class="add-to-cart">Add to Cart</button>
-        </div>
-        
-        <div class="product" data-product-id="8">
-            <div class="product-badge">SALE</div>
-            <div>📱 Phone</div>
-            <div class="product-title">Huawei Nova 8 Original</div>
-            <div class="price">$399.90</div>
-            <button class="add-to-cart">Add to Cart</button>
-        </div>
-    </div>
-    
-    <!-- Sprig setup script -->
-    <script src="sprig-setup.js"></script>
+    <main>
+        <section class="user-controls">
+            <div class="control-panel">
+                <h2>User Simulation Panel</h2>
+                <div class="form-group">
+                    <label for="userType">Acting as:</label>
+                    <select id="userType">
+                        <option value="user">Individual User</option>
+                        <option value="group">Group Member</option>
+                        <option value="company">Company Member</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="entityId">Entity ID:</label>
+                    <input type="text" id="entityId" placeholder="Enter ID or generate random">
+                    <button id="generateId">Generate Random ID</button>
+                </div>
+                <div class="action-buttons">
+                    <button id="performEvent">Perform Random Event</button>
+                    <button id="identify">Identify User</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="metrics">
+            <h2>Simulated Metrics</h2>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <h3>Total Events Performed</h3>
+                    <p id="totalEvents">0</p>
+                </div>
+                <div class="metric-card">
+                    <h3>Active Days</h3>
+                    <p id="activeDays">0</p>
+                </div>
+                <div class="metric-card">
+                    <h3>First Seen</h3>
+                    <p id="firstSeen">Never</p>
+                </div>
+                <div class="metric-card">
+                    <h3>Last Seen</h3>
+                    <p id="lastSeen">Never</p>
+                </div>
+                <div class="metric-card">
+                    <h3>Usage Trend</h3>
+                    <p id="usageTrend">+0%</p>
+                </div>
+                <div class="metric-card">
+                    <h3>Total Seats</h3>
+                    <p id="totalSeats">0</p>
+                </div>
+                <div class="metric-card">
+                    <h3>Active Seats</h3>
+                    <p id="activeSeats">0</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="event-log">
+            <h2>Event Log</h2>
+            <div class="log-container">
+                <ul id="eventLog"></ul>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>This demo site simulates June.so analytics tracking. No real data is being displayed.</p>
+    </footer>
+
+    <script src="script.js"></script>
 </body>
 </html>
